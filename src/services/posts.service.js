@@ -50,6 +50,10 @@ export default {
 
   titleFormatter(title) {
     if (title.length > 20) {
+      //if 20-th char is ' ' then get 19 chars and add '...'
+      if (title[19] === ' ') {
+        return title.substr(0, 19) + '...';
+      }
       return title.substr(0, 20) + '...';
     }
     return title;
