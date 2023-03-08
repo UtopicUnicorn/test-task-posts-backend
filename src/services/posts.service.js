@@ -50,11 +50,7 @@ export default {
 
   titleFormatter(title) {
     if (title.length > 20) {
-      //if 20-th char is ' ' then get 19 chars and add '...'
-      if (title[19] === ' ') {
-        return title.substr(0, 19) + '...';
-      }
-      return title.substr(0, 20) + '...';
+      return title.substr(0, 20).trim() + '...';
     }
     return title;
   },
@@ -64,14 +60,15 @@ export default {
   },
 
   async commentsOnPosts(user) {
-    for (let post of user.posts) {
-      const comments = await this.getComments(post.id);
-      for (let comment of comments.data) {
-        delete comment.postId;
-      }
-      post.comments = comments.data;
-    }
-    return user;
+    const promises = user.posts.map(async (post) => {
+      const { data } = await this.getComments(post.id);
+      post.comments = data.map((item) => {
+        delete item.postId;
+        return item;
+      });
+      return post;
+    });
+    return Promise.all(promises);
   },
 
   async formatUser(user, posts) {
